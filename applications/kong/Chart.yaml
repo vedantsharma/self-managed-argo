@@ -1,8 +1,0 @@
-apiVersion: v2
-name: ingress-kong
-type: application
-version: 0.0.0
-dependencies:
-- name: kong
-  version: 2.26.3
-  repository: https://charts.konghq.com
