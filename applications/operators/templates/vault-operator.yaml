@@ -9,7 +9,8 @@ metadata:
   name: operatorgroup 
   namespace: vault 
 spec: 
-  targetNamespaces: - vault 
+  targetNamespaces: 
+  - vault 
 --- 
 apiVersion: operators.coreos.com/v1alpha1 
 kind: Subscription 
