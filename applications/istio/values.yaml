@@ -111,7 +111,7 @@ waitForResourcesTimeout: 300s
 
 controlPlane:
   # -- If `true`, install the _Istio_ control plane.
-  install: false
+  install: true
   # -- Annotations to add to the `IstioOperator` CR.
   annotations: {}
   # -- Spec for the `IstioOperator` CR.
