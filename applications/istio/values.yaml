@@ -98,7 +98,7 @@ serviceMonitor:
 
 dashboards:
   # -- If `true`, install the _Grafana_ dashboards provided by the chart.
-  enabled: false
+  enabled: true
 
 # -- Namespace to install _Istio_ into.
 istioNamespace: istio-system
