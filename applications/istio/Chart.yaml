@@ -6,3 +6,4 @@ dependencies:
 - name: istio-operator
   version: 2.13.2
   repository: "oci://ghcr.io/stevehipwell/helm-charts"
+  
