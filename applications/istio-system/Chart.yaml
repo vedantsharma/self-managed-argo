@@ -1,7 +1,7 @@
 apiVersion: v2
 name: istio-system
 type: application
-version: 1.0.0
+version: 0.0.0
 dependencies:
 - name: istio-operator
   repository: "https://kubernetes-charts.banzaicloud.com"
