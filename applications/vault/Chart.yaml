@@ -3,9 +3,9 @@ name: vault
 type: application
 version: 0.0.0
 dependencies:
-- name: vault-operator
-  version: 1.21.2
-  repository: "oci://ghcr.io/bank-vaults/helm-charts"
+- name: vault-secrets-operator
+  version: 0.4.3
+  repository: "https://helm.releases.hashicorp.com"
 - name: vault-secrets-webhook
   version: 1.20.0
   repository: oci://ghcr.io/bank-vaults/helm-charts
