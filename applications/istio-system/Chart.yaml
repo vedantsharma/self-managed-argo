@@ -1,8 +1,0 @@
-apiVersion: v2
-name: vault
-type: application
-version: 0.0.0
-dependencies:
-- name: istiod
-  version: 1.20.2
-  repository: "https://istio-release.storage.googleapis.com/charts"
