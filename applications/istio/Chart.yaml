@@ -1,9 +1,10 @@
-apiVersion: v2
-name: istio
-type: application
-version: 0.0.0
-dependencies:
-- name: istio-operator
-  version: 2.13.2
-  repository: "oci://ghcr.io/stevehipwell/helm-charts"
+apiVersion: v1
+name: istio-operator
+version: 0.0.14
+description: istio-operator manages Istio deployments on Kubernetes
+sources:
+  - https://github.com/banzaicloud/istio-operator
+appVersion: 0.1.21
+icon: https://istio.io/img/istio-logo-social-blue-background.svg
+
   
