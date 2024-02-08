@@ -2,8 +2,5 @@ apiVersion: v2
 name: istio
 type: application
 version: 0.0.0
-dependencies:
-- name: istio-operator
-  version: 2.13.2
-  repository: "oci://ghcr.io/stevehipwell/helm-charts"
+
   
