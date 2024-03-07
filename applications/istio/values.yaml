@@ -690,7 +690,7 @@
 
 
     excludeNamespaces:
-      - istio-system
+      - istio
       - kube-system
 
     # Allows user to set custom affinity for the DaemonSet
