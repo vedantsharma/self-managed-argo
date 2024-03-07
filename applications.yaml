@@ -26,15 +26,9 @@ spec:
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{path.basename}}'
-      # https://github.com/argoproj/argo-cd/issues/5178
-      ignoreDifferences:
-        - group: ""
-          kind: Secret
-          jqPathExpressions:
-            - select(.metadata.annotations.vaultInjectionChecksum) | .data
       syncPolicy:
         automated: 
-          prune: false
+          prune: true
           selfHeal: true 
         syncOptions:   
         - CreateNamespace=true
