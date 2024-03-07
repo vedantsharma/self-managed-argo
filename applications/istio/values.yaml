@@ -2,7 +2,7 @@ defaults:
   global:
 
     # Used to locate istiod.
-    istioNamespace: istio
+    istioNamespace: istio-system
     # List of cert-signers to allow "approve" action in the istio cluster role
     #
     # certSigners:
