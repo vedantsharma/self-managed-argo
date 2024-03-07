@@ -1,4 +1,4 @@
 apiVersion: v2
-name: argocd
+name: argocd-istio
 type: application
 version: 0.0.0

@@ -8,7 +8,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   # Project description
-  description: cluster management
+  description: istio management POC
 
   # Allow manifests to deploy from these Git repos
   sourceRepos:
