@@ -1,0 +1,14 @@
+apiVersion: v1
+name: istio
+description: A Helm chart for istio which contains base-chart, istiod, gateway
+version: 0.0.1
+dependencies:
+  - name: istio/base
+    version: "1.16.1"
+    repository: "https://istio-release.storage.googleapis.com/charts"
+  - name: istio/istiod
+    version: "1.16.1"
+    repository: "https://istio-release.storage.googleapis.com/charts"
+  - name: istio/gateway
+    version: "0.1.0"
+    repository: "https://istio-release.storage.googleapis.com/charts"
