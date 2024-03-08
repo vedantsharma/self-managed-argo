@@ -1,4 +1,3 @@
-default:
   global:
     # Used to locate istiod.
     istioNamespace: istio
@@ -21,10 +20,10 @@ default:
     defaultResources:
       requests:
         cpu: 10m
-      #   memory: 128Mi
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
 
     # Default hub for Istio images.
     # Releases are published to docker hub under 'istio' project.
