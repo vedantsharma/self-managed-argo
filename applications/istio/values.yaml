@@ -1,10 +1,213 @@
-  global:
+base:
+    # Used for helm2 to add the CRDs to templates.
+    enableCRDTemplates: false
+
+    # Validation webhook configuration url
+    # For example: https://$remotePilotAddress:15017/validate
+    validationURL: ""
+
+    # For istioctl usage to disable istio config crds in base
+    enableIstioConfigCRDs: true
+
+defaultRevision: "default"
+
+pilot:
+    autoscaleEnabled: true
+    autoscaleMin: 1
+    autoscaleMax: 5
+    autoscaleBehavior: {}
+    replicaCount: 1
+    rollingMaxSurge: 100%
+    rollingMaxUnavailable: 25%
+
+    hub: ""
+    tag: ""
+    variant: ""
+
+    # Can be a full hub/image:tag
+    image: pilot
+    traceSampling: 1.0
+
+    # Resources for a small pilot install
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2048Mi
+
+    # Set to `type: RuntimeDefault` to use the default profile if available.
+    seccompProfile: {}
+
+    # Additional container arguments
+    extraContainerArgs: []
+
+    env: {}
+
+    affinity: {}
+
+    tolerations: []
+
+    cpu:
+      targetAverageUtilization: 80
+    memory: {}
+      # targetAverageUtilization: 80
+
+    # Additional volumeMounts to the istiod container
+    volumeMounts: []
+
+    # Additional volumes to the istiod pod
+    volumes: []
+
+    nodeSelector: {}
+    podAnnotations: {}
+    serviceAnnotations: {}
+
+    topologySpreadConstraints: []
+
+    # You can use jwksResolverExtraRootCA to provide a root certificate
+    # in PEM format. This will then be trusted by pilot when resolving
+    # JWKS URIs.
+    jwksResolverExtraRootCA: ""
+
+    # This is used to set the source of configuration for
+    # the associated address in configSource, if nothing is specified
+    # the default MCP is assumed.
+    configSource:
+      subscribedResources: []
+
+    plugins: []
+
+    # The following is used to limit how long a sidecar can be connected
+    # to a pilot. It balances out load across pilot instances at the cost of
+    # increasing system churn.
+    keepaliveMaxServerConnectionAge: 30m
+
+    # Additional labels to apply to the deployment.
+    deploymentLabels: {}
+
+    ## Mesh config settings
+
+    # Install the mesh config map, generated from values.yaml.
+    # If false, pilot wil use default values (by default) or user-supplied values.
+    configMap: true
+
+    # Additional labels to apply on the pod level for monitoring and logging configuration.
+    podLabels: {}
+
+    # Setup how istiod Service is configured. See https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
+    ipFamilyPolicy: ""
+    ipFamilies: []
+
+sidecarInjectorWebhook:
+    # You can use the field called alwaysInjectSelector and neverInjectSelector which will always inject the sidecar or
+    # always skip the injection on pods that match that label selector, regardless of the global policy.
+    # See https://istio.io/docs/setup/kubernetes/additional-setup/sidecar-injection/#more-control-adding-exceptions
+    neverInjectSelector: []
+    alwaysInjectSelector: []
+
+    # injectedAnnotations are additional annotations that will be added to the pod spec after injection
+    # This is primarily to support PSP annotations. For example, if you defined a PSP with the annotations:
+    #
+    # annotations:
+    #   apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    #   apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
+    #
+    # The PSP controller would add corresponding annotations to the pod spec for each container. However, this happens before
+    # the inject adds additional containers, so we must specify them explicitly here. With the above example, we could specify:
+    # injectedAnnotations:
+    #   container.apparmor.security.beta.kubernetes.io/istio-init: runtime/default
+    #   container.apparmor.security.beta.kubernetes.io/istio-proxy: runtime/default
+    injectedAnnotations: {}
+
+    # This enables injection of sidecar in all namespaces,
+    # with the exception of namespaces with "istio-injection:disabled" annotation
+    # Only one environment should have this enabled.
+    enableNamespacesByDefault: false
+
+    # Mutations that occur after the sidecar injector are not handled by default, as the Istio sidecar injector is only run
+    # once. For example, an OPA sidecar injected after the Istio sidecar will not have it's liveness/readiness probes rewritten.
+    # Setting this to `IfNeeded` will result in the sidecar injector being run again if additional mutations occur.
+    reinvocationPolicy: Never
+
+    rewriteAppHTTPProbe: true
+
+    # Templates defines a set of custom injection templates that can be used. For example, defining:
+    #
+    # templates:
+    #   hello: |
+    #     metadata:
+    #       labels:
+    #         hello: world
+    #
+    # Then starting a pod with the `inject.istio.io/templates: hello` annotation, will result in the pod
+    # being injected with the hello=world labels.
+    # This is intended for advanced configuration only; most users should use the built in template
+    templates: {}
+
+    # Default templates specifies a set of default templates that are used in sidecar injection.
+    # By default, a template `sidecar` is always provided, which contains the template of default sidecar.
+    # To inject other additional templates, define it using the `templates` option, and add it to
+    # the default templates list.
+    # For example:
+    #
+    # templates:
+    #   hello: |
+    #     metadata:
+    #       labels:
+    #         hello: world
+    #
+    # defaultTemplates: ["sidecar", "hello"]
+    defaultTemplates: []
+istiodRemote:
+    # Sidecar injector mutating webhook configuration clientConfig.url value.
+    # For example: https://$remotePilotAddress:15017/inject
+    # The host should not refer to a service running in the cluster; use a service reference by specifying
+    # the clientConfig.service field instead.
+    injectionURL: ""
+
+    # Sidecar injector mutating webhook configuration path value for the clientConfig.service field.
+    # Override to pass env variables, for example: /inject/cluster/remote/net/network2
+    injectionPath: "/inject"
+telemetry:
+    enabled: true
+    v2:
+      # For Null VM case now.
+      # This also enables metadata exchange.
+      enabled: true
+      # Indicate if prometheus stats filter is enabled or not
+      prometheus:
+        enabled: true
+      # stackdriver filter settings.
+      stackdriver:
+        enabled: false
+  # Revision is set as 'version' label and part of the resource names when installing multiple control planes.
+revision: ""
+
+  # Revision tags are aliases to Istio control plane revisions
+revisionTags: []
+
+  # For Helm compatibility.
+ownerName: ""
+
+  # meshConfig defines runtime configuration of components, including Istiod and istio-agent behavior
+  # See https://istio.io/docs/reference/config/istio.mesh.v1alpha1/ for all available options
+meshConfig:
+    enablePrometheusMerge: true
+
+global:
+
     # Used to locate istiod.
     istioNamespace: istio
-    # List of cert-signers to allow "approve" action in the istio cluster role
-    #
-    # certSigners:
-    #   - clusterissuers.cert-manager.io/istio-ca
+
+    configValidation: true
+    # Platform where Istio is deployed. Possible values are: "openshift", "gcp".
+    # An empty value means it is a vanilla Kubernetes distribution, therefore no special
+    # treatment will be considered.
+    platform: ""
+
+    # Setup how istiod Service is configured. See https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
+    # This is intended only for use with external istiod.
+    ipFamilyPolicy: ""
+    ipFamilies: []
     certSigners: []
     # enable pod disruption budget for the control plane, which is used to
     # ensure Istio control plane components are gradually upgraded or recovered.
@@ -296,508 +499,8 @@
     # whether to use autoscaling/v2 template for HPA settings
     # for internal usage only, not to be configured by users.
     autoscalingv2API: true
-    # ImagePullSecrets for control plane ServiceAccount, list of secrets in the same namespace
-    # to use for pulling any images in pods that reference this ServiceAccount.
-    # Must be set for any cluster configured with private docker registry.
-    # Used to locate istiod.
-
-    configValidation: true
-
-    # Platform where Istio is deployed. Possible values are: "openshift", "gcp".
-    # An empty value means it is a vanilla Kubernetes distribution, therefore no special
-    # treatment will be considered.
-    platform: ""
-
-    # Setup how istiod Service is configured. See https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
-    # This is intended only for use with external istiod.
-    ipFamilyPolicy: ""
-    ipFamilies: []
-
-  defaultRevision: "default"
-
-
-  pilot:
-    autoscaleEnabled: true
-    autoscaleMin: 1
-    autoscaleMax: 5
-    autoscaleBehavior: {}
-    replicaCount: 1
-    rollingMaxSurge: 100%
-    rollingMaxUnavailable: 25%
-
-    hub: ""
-    tag: ""
-    variant: ""
-
-    # Can be a full hub/image:tag
-    image: pilot
-    traceSampling: 1.0
-
-    # Resources for a small pilot install
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1024Mi
-      limits:
-        cpu: 800m
-        memory: 2048Mi
-
-    # Set to `type: RuntimeDefault` to use the default profile if available.
-    seccompProfile: {}
-
-    # Additional container arguments
-    extraContainerArgs: []
-
-    env: {}
-
-    affinity: {}
-
-    tolerations: []
-
-    cpu:
-      targetAverageUtilization: 80
-    memory: {}
-      # targetAverageUtilization: 80
-
-    # Additional volumeMounts to the istiod container
-    volumeMounts: []
-
-    # Additional volumes to the istiod pod
-    volumes: []
-
-    nodeSelector: {}
-    podAnnotations: {}
-    serviceAnnotations: {}
-
-    topologySpreadConstraints: []
-
-    # You can use jwksResolverExtraRootCA to provide a root certificate
-    # in PEM format. This will then be trusted by pilot when resolving
-    # JWKS URIs.
-    jwksResolverExtraRootCA: ""
-
-    # This is used to set the source of configuration for
-    # the associated address in configSource, if nothing is specified
-    # the default MCP is assumed.
-    configSource:
-      subscribedResources: []
-
-    plugins: []
-
-    # The following is used to limit how long a sidecar can be connected
-    # to a pilot. It balances out load across pilot instances at the cost of
-    # increasing system churn.
-    keepaliveMaxServerConnectionAge: 30m
-
-    # Additional labels to apply to the deployment.
-    deploymentLabels: {}
-
-    ## Mesh config settings
-
-    # Install the mesh config map, generated from values.yaml.
-    # If false, pilot wil use default values (by default) or user-supplied values.
-    configMap: true
-
-    # Additional labels to apply on the pod level for monitoring and logging configuration.
-    podLabels: {}
-
-    # Setup how istiod Service is configured. See https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
-    ipFamilyPolicy: ""
-    ipFamilies: []
-
-  sidecarInjectorWebhook:
-    # You can use the field called alwaysInjectSelector and neverInjectSelector which will always inject the sidecar or
-    # always skip the injection on pods that match that label selector, regardless of the global policy.
-    # See https://istio.io/docs/setup/kubernetes/additional-setup/sidecar-injection/#more-control-adding-exceptions
-    neverInjectSelector: []
-    alwaysInjectSelector: []
-
-    # injectedAnnotations are additional annotations that will be added to the pod spec after injection
-    # This is primarily to support PSP annotations. For example, if you defined a PSP with the annotations:
-    #
-    # annotations:
-    #   apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
-    #   apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
-    #
-    # The PSP controller would add corresponding annotations to the pod spec for each container. However, this happens before
-    # the inject adds additional containers, so we must specify them explicitly here. With the above example, we could specify:
-    # injectedAnnotations:
-    #   container.apparmor.security.beta.kubernetes.io/istio-init: runtime/default
-    #   container.apparmor.security.beta.kubernetes.io/istio-proxy: runtime/default
-    injectedAnnotations: {}
-
-    # This enables injection of sidecar in all namespaces,
-    # with the exception of namespaces with "istio-injection:disabled" annotation
-    # Only one environment should have this enabled.
-    enableNamespacesByDefault: false
-
-    # Mutations that occur after the sidecar injector are not handled by default, as the Istio sidecar injector is only run
-    # once. For example, an OPA sidecar injected after the Istio sidecar will not have it's liveness/readiness probes rewritten.
-    # Setting this to `IfNeeded` will result in the sidecar injector being run again if additional mutations occur.
-    reinvocationPolicy: Never
-
-    rewriteAppHTTPProbe: true
-
-    # Templates defines a set of custom injection templates that can be used. For example, defining:
-    #
-    # templates:
-    #   hello: |
-    #     metadata:
-    #       labels:
-    #         hello: world
-    #
-    # Then starting a pod with the `inject.istio.io/templates: hello` annotation, will result in the pod
-    # being injected with the hello=world labels.
-    # This is intended for advanced configuration only; most users should use the built in template
-    templates: {}
-
-    # Default templates specifies a set of default templates that are used in sidecar injection.
-    # By default, a template `sidecar` is always provided, which contains the template of default sidecar.
-    # To inject other additional templates, define it using the `templates` option, and add it to
-    # the default templates list.
-    # For example:
-    #
-    # templates:
-    #   hello: |
-    #     metadata:
-    #       labels:
-    #         hello: world
-    #
-    # defaultTemplates: ["sidecar", "hello"]
-    defaultTemplates: []
-  istiodRemote:
-    # Sidecar injector mutating webhook configuration clientConfig.url value.
-    # For example: https://$remotePilotAddress:15017/inject
-    # The host should not refer to a service running in the cluster; use a service reference by specifying
-    # the clientConfig.service field instead.
-    injectionURL: ""
-
-    # Sidecar injector mutating webhook configuration path value for the clientConfig.service field.
-    # Override to pass env variables, for example: /inject/cluster/remote/net/network2
-    injectionPath: "/inject"
-  telemetry:
-    enabled: true
-    v2:
-      # For Null VM case now.
-      # This also enables metadata exchange.
-      enabled: true
-      # Indicate if prometheus stats filter is enabled or not
-      prometheus:
-        enabled: true
-      # stackdriver filter settings.
-      stackdriver:
-        enabled: false
-  # Revision is set as 'version' label and part of the resource names when installing multiple control planes.
-  revision: ""
-
-  # Revision tags are aliases to Istio control plane revisions
-  revisionTags: []
-
-  # For Helm compatibility.
-  ownerName: ""
-
-  # meshConfig defines runtime configuration of components, including Istiod and istio-agent behavior
-  # See https://istio.io/docs/reference/config/istio.mesh.v1alpha1/ for all available options
-  meshConfig:
-    enablePrometheusMerge: true
-
-  base:
-    # For istioctl usage to disable istio config crds in base
-    enableIstioConfigCRDs: true
-    enableCRDTemplates: false
 
     #  keep in sync with settings used when installing the Istio CNI chart
-  istio_cni:
+istio_cni:
     enabled: true
     chained: true
-
-##########################################################################
-#gateway
-##########################################################################
-
-  name: ""
-  # revision declares which revision this gateway is a part of
-
-  # Controls the spec.replicas setting for the Gateway deployment if set.
-  # Otherwise defaults to Kubernetes Deployment default (1).
-  replicaCount:
-
-  kind: Deployment
-
-  rbac:
-    # If enabled, roles will be created to enable accessing certificates from Gateways. This is not needed
-    # when using http://gateway-api.org/.
-    enabled: true
-
-  serviceAccount:
-    # If set, a service account will be created. Otherwise, the default is used
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set, the release name is used
-    name: ""
-
-  podAnnotations:
-    prometheus.io/port: "15020"
-    prometheus.io/scrape: "true"
-    prometheus.io/path: "/stats/prometheus"
-    inject.istio.io/templates: "gateway"
-    sidecar.istio.io/inject: "true"
-
-  # Define the security context for the pod.
-  # If unset, this will be automatically set to the minimum privileges required to bind to port 80 and 443.
-  # On Kubernetes 1.22+, this only requires the `net.ipv4.ip_unprivileged_port_start` sysctl.
-  securityContext: ~
-  containerSecurityContext: ~
-
-  service:
-    # Type of service. Set to "None" to disable the service entirely
-    type: LoadBalancer
-    ports:
-    - name: status-port
-      port: 15021
-      protocol: TCP
-      targetPort: 15021
-    - name: http2
-      port: 80
-      protocol: TCP
-      targetPort: 80
-    - name: https
-      port: 443
-      protocol: TCP
-      targetPort: 443
-    annotations: {}
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: []
-    externalTrafficPolicy: ""
-    externalIPs: []
-    ipFamilyPolicy: ""
-    ipFamilies: []
-    ## Whether to automatically allocate NodePorts (only for LoadBalancers).
-    # allocateLoadBalancerNodePorts: false
-
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 2000m
-      memory: 1024Mi
-
-  autoscaling:
-    enabled: true
-    minReplicas: 1
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: {}
-    autoscaleBehavior: {}
-
-  # Pod environment variables
-  env: {}
-
-  # Labels to apply to all resources
-  labels: {}
-
-  # Annotations to apply to all resources
-  annotations: {}
-
-  nodeSelector: {}
-
-  tolerations: []
-
-  topologySpreadConstraints: []
-
-  affinity: {}
-
-  # If specified, the gateway will act as a network gateway for the given network.
-  networkGateway: ""
-
-  # Specify image pull policy if default behavior isn't desired.
-  # Default behavior: latest images will be Always else IfNotPresent
-  imagePullPolicy: ""
-
-  imagePullSecrets: []
-
-  # This value is used to configure a Kubernetes PodDisruptionBudget for the gateway.
-  #
-  # By default, the `podDisruptionBudget` is disabled (set to `{}`),
-  # which means that no PodDisruptionBudget resource will be created.
-  #
-  # To enable the PodDisruptionBudget, configure it by specifying the
-  # `minAvailable` or `maxUnavailable`. For example, to set the
-  # minimum number of available replicas to 1, you can update this value as follows:
-  #
-  # podDisruptionBudget:
-  #   minAvailable: 1
-  #
-  # Or, to allow a maximum of 1 unavailable replica, you can set:
-  #
-  # podDisruptionBudget:
-  #   maxUnavailable: 1
-  #
-  # You can also specify the `unhealthyPodEvictionPolicy` field, and the valid values are `IfHealthyBudget` and `AlwaysAllow`.
-  # For example, to set the `unhealthyPodEvictionPolicy` to `AlwaysAllow`, you can update this value as follows:
-  #
-  # podDisruptionBudget:
-  #   minAvailable: 1
-  #   unhealthyPodEvictionPolicy: AlwaysAllow
-  #
-  # To disable the PodDisruptionBudget, you can leave it as an empty object `{}`:
-  #
-  # podDisruptionBudget: {}
-  #
-  podDisruptionBudget: {}
-
-  terminationGracePeriodSeconds: 30
-
-  # A list of `Volumes` added into the Gateway Pods. See
-  # https://kubernetes.io/docs/concepts/storage/volumes/.
-  volumes: []
-
-  # A list of `VolumeMounts` added into the Gateway Pods. See
-  # https://kubernetes.io/docs/concepts/storage/volumes/.
-  volumeMounts: []
-
-  # Configure this to a higher priority class in order to make sure your Istio gateway pods
-  # will not be killed because of low priority class.
-  # Refer to https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
-  # for more detail.
-  priorityClassName: ""
-
-  cni:
-    image: install-cni
-    pullPolicy: ""
-
-    # Configuration log level of istio-cni binary
-    # by default istio-cni send all logs to UDS server
-    # if want to see them you need change global.logging.level with cni:debug
-    logLevel: debug
-
-    # Configuration file to insert istio-cni plugin configuration
-    # by default this will be the first file found in the cni-conf-dir
-    # Example
-    # cniConfFileName: 10-calico.conflist
-
-    # CNI bin and conf dir override settings
-    # defaults:
-    cniBinDir: "" # Auto-detected based on version; defaults to /opt/cni/bin.
-    cniConfDir: /etc/cni/net.d
-    cniConfFileName: ""
-    # This directory must exist on the node, if it does not, consult your container runtime
-    # documentation for the appropriate path.
-    cniNetnsDir: # Defaults to '/var/run/netns', in minikube/docker/others can be '/var/run/docker/netns'.
-
-
-    excludeNamespaces:
-      - istio
-      - kube-system
-
-    # Allows user to set custom affinity for the DaemonSet
-    affinity: {}
-
-    # Custom annotations on pod level, if you need them
-    podAnnotations: {}
-
-    # Deploy the config files as plugin chain (value "true") or as standalone files in the conf dir (value "false")?
-    # Some k8s flavors (e.g. OpenShift) do not support the chain approach, set to false if this is the case
-    chained: true
-
-    # Allow the istio-cni container to run in privileged mode, needed for some platforms (e.g. OpenShift) or features (repairPods)
-    # Note that even if this is false, the `istio-cni` container *requires* root privileges on the node to function,
-    # and setting this to false does not change that, nor will it run the container as non-root or make it "un-privileged".
-    privileged: false
-
-    # Custom configuration happens based on the CNI provider.
-    # Possible values: "default", "multus"
-    provider: "default"
-
-    # Configure ambient settings
-    ambient:
-      # If enabled, ambient redirection will be enabled
-      enabled: false
-      # Set ambient config dir path: defaults to /etc/ambient-config
-      configDir: ""
-      # If enabled, and ambient is enabled, DNS redirection will be enabled
-      dnsCapture: false
-
-
-    repair:
-      enabled: true
-      hub: ""
-      tag: ""
-
-      # Repair controller has 3 modes. Pick which one meets your use cases. Note only one may be used.
-      # This defines the action the controller will take when a pod is detected as broken.
-
-      # labelPods will label all pods with <brokenPodLabelKey>=<brokenPodLabelValue>.
-      # This is only capable of identifying broken pods; the user is responsible for fixing them (generally, by deleting them).
-      # Note this gives the DaemonSet a relatively high privilege, as modifying pod metadata/status can have wider impacts.
-      labelPods: false
-      # deletePods will delete any broken pod. These will then be rescheduled, hopefully onto a node that is fully ready.
-      # Note this gives the DaemonSet a relatively high privilege, as it can delete any Pod.
-      deletePods: false
-      # repairPods will dynamically repair any broken pod by setting up the pod networking configuration even after it has started.
-      # Note the pod will be crashlooping, so this may take a few minutes to become fully functional based on when the retry occurs.
-      # This requires no RBAC privilege, but does require `securityContext.privileged`.
-      repairPods: true
-
-      initContainerName: "istio-validation"
-
-      brokenPodLabelKey: "cni.istio.io/uninitialized"
-      brokenPodLabelValue: "true"
-
-    # Set to `type: RuntimeDefault` to use the default profile if available.
-    seccompProfile: {}
-
-    resources:
-      requests:
-        cpu: 100m
-        memory: 100Mi
-
-    resourceQuotas:
-      enabled: false
-      pods: 5000
-
-    # The number of pods that can be unavailable during rolling update (see
-    # `updateStrategy.rollingUpdate.maxUnavailable` here:
-    # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/daemon-set-v1/#DaemonSetSpec).
-    # May be specified as a number of pods or as a percent of the total number
-    # of pods at the start of the update.
-    rollingMaxUnavailable: 1
-
-  # Revision is set as 'version' label and part of the resource names when installing multiple control planes.lt hub for Istio images.
-    # Releases are published to docker hub under 'istio' project.
-    # Dev builds from prow are on gcr.io
-    hub: docker.io/istio
-
-    # Default tag for Istio images.
-    tag: 1.21.0-rc.1
-
-    # Variant of the image to use.
-    # Currently supported are: [debug, distroless]
-    variant: ""
-
-    # Specify image pull policy if default behavior isn't desired.
-    # Default behavior: latest images will be Always else IfNotPresent.
-    imagePullPolicy: ""
-
-    # change cni scope level to control logging out of istio-cni-node DaemonSet
-    logging:
-      level: default:info,cni:info
-
-    logAsJson: false
-
-    # ImagePullSecrets for all ServiceAccount, list of secrets in the same namespace
-    # to use for pulling any images in pods that reference this ServiceAccount.
-    # For components that don't use ServiceAccounts (i.e. grafana, servicegraph, tracing)
-    # ImagePullSecrets will be added to the corresponding Deployment(StatefulSet) objects.
-    # Must be set for any cluster configured with private docker registry.
-    imagePullSecrets: []
-    # - private-registry-key
-
-    # Default resources allocated
-    defaultResources:
-      requests:
-        cpu: 100m
-        memory: 100Mi
