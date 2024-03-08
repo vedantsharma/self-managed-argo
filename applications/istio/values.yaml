@@ -502,5 +502,5 @@ global:
 
     #  keep in sync with settings used when installing the Istio CNI chart
 istio_cni:
-    enabled: true
-    chained: true
+    enabled: false
+    chained: false
