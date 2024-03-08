@@ -1,3 +1,4 @@
+default:
   global:
     # Used to locate istiod.
     istioNamespace: istio
