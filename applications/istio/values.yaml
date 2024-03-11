@@ -556,7 +556,7 @@ cni:
     # Allow the istio-cni container to run in privileged mode, needed for some platforms (e.g. OpenShift) or features (repairPods)
     # Note that even if this is false, the `istio-cni` container *requires* root privileges on the node to function,
     # and setting this to false does not change that, nor will it run the container as non-root or make it "un-privileged".
-    privileged: false
+    privileged: true
 
     # Custom configuration happens based on the CNI provider.
     # Possible values: "default", "multus"
@@ -573,7 +573,7 @@ cni:
 
 
     repair:
-      enabled: false
+      enabled: true
       hub: ""
       tag: ""
 
@@ -590,7 +590,7 @@ cni:
       # repairPods will dynamically repair any broken pod by setting up the pod networking configuration even after it has started.
       # Note the pod will be crashlooping, so this may take a few minutes to become fully functional based on when the retry occurs.
       # This requires no RBAC privilege, but does require `securityContext.privileged`.
-      repairPods: false
+      repairPods: true
 
       initContainerName: "istio-validation"
 
