@@ -569,7 +569,7 @@ cni:
 
 
     repair:
-      enabled: true
+      enabled: false
       hub: ""
       tag: ""
 
