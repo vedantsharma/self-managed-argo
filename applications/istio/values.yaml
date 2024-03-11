@@ -1,6 +1,6 @@
 base:
     # Used for helm2 to add the CRDs to templates.
-    enableCRDTemplates: false
+    enableCRDTemplates: true
 
     # Validation webhook configuration url
     # For example: https://$remotePilotAddress:15017/validate
@@ -32,6 +32,9 @@ pilot:
     resources:
       requests:
         cpu: 500m
+        memory: 1048Mi
+      limits:
+        cpu: 800m
         memory: 2048Mi
 
     # Set to `type: RuntimeDefault` to use the default profile if available.
@@ -333,7 +336,7 @@ global:
       logLevel: warning
 
       #If set to true, istio-proxy container will have privileged securityContext
-      privileged: false
+      privileged: true
 
       # The number of successive failed probes before indicating readiness failure.
       readinessFailureThreshold: 4
@@ -363,8 +366,8 @@ global:
           cpu: 100m
           memory: 128Mi
         limits:
-          cpu: 2000m
-          memory: 1024Mi
+          cpu: 200m
+          memory: 256Mi
 
       # Default port for Pilot agent health checks. A value of 0 will disable health checking.
       statusPort: 15020
@@ -502,15 +505,15 @@ global:
 
     #  keep in sync with settings used when installing the Istio CNI chart
 istio_cni:
-    enabled: false
-    chained: false
+    enabled: true
+    chained: true
 
 cni:
     hub: ""
     tag: ""
     variant: ""
     image: install-cni
-    pullPolicy: ""
+    pullPolicy: "IfNotPresent"
 
     # Configuration log level of istio-cni binary
     # by default istio-cni send all logs to UDS server
@@ -597,6 +600,9 @@ cni:
       requests:
         cpu: 100m
         memory: 100Mi
+      limits:
+        cpu: 200m
+        memory: 200Mi
 
     resourceQuotas:
       enabled: false
@@ -675,8 +681,8 @@ resources:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: 2000m
-      memory: 1024Mi
+      cpu: 200m
+      memory: 256Mi
 
 autoscaling:
     enabled: true
