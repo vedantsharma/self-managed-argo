@@ -9,9 +9,9 @@ dependencies:
   - name: istiod
     version: "1.21.0-rc.1"
     repository: "https://istio-release.storage.googleapis.com/charts"
-  # - name: gateway
-  #   version: "1.21.0-rc.1"
-  #   repository: "https://istio-release.storage.googleapis.com/charts"
+  - name: gateway
+    version: "1.21.0-rc.1"
+    repository: "https://istio-release.storage.googleapis.com/charts"
   # - name: cni
   #   version: "1.21.0-rc.1"
   #   repository: "https://istio-release.storage.googleapis.com/charts" 

@@ -1,8 +1,0 @@
-apiVersion: v1
-name: istio
-description: A Helm chart for istio which contains gateway
-version: 0.0.1
-dependencies:
-  - name: gateway
-    version: "1.21.0-rc.1"
-    repository: "https://istio-release.storage.googleapis.com/charts"
