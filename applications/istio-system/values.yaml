@@ -12,7 +12,7 @@ base:
 global:
 
     # Used to locate istiod.
-    istioNamespace: istio
+    istioNamespace: istio-system
 
     configValidation: true
     # Platform where Istio is deployed. Possible values are: "openshift", "gcp".
@@ -540,7 +540,7 @@ cni:
 
 
     excludeNamespaces:
-      - istio
+      - istio-system
       - kube-system
 
     # Allows user to set custom affinity for the DaemonSet
