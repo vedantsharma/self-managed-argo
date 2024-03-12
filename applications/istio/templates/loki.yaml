@@ -252,7 +252,11 @@ spec:
             - name: storage
               mountPath: /var/loki
           resources:
-            {}
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 640Mi
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -280,4 +284,4 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: "10Gi"
+            storage: "2Gi"
