@@ -49,4 +49,4 @@ spec:
     - destination:
         host: details
         subset: v1
----
+        
